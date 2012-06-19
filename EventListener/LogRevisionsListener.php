@@ -156,8 +156,17 @@ class LogRevisionsListener implements EventSubscriber
             );
 
             // Perhaps, we should use change this test for something more precise
-            if ( $this->platform->getName() == 'oracle') {
+            if ($this->platform->getName() == 'oracle') {
                 // For Oracle, we do not use trigger and use a sequence
+                $insertData[$this->config->getRevisionIdFieldName()] = (int)$this->conn->fetchColumn(
+                    $this->platform->getSequenceNextValSQL($this->config->getRevisionSequenceName())
+                );
+                $this->conn->insert($this->config->getRevisionTableName(), $insertData);
+                $this->revisionId = $this->conn->lastInsertId($this->config->getRevisionSequenceName());
+            } else if ($this->platform->getName() == 'postgresql') {
+                // For PostrgreSQL, we do not use trigger and use a sequence
+                // Sets revision's default sequence name for PostrgreSQL
+                $this->config->setRevisionSequenceName('revisions_id_seq');
                 $insertData[$this->config->getRevisionIdFieldName()] = (int)$this->conn->fetchColumn(
                     $this->platform->getSequenceNextValSQL($this->config->getRevisionSequenceName())
                 );
