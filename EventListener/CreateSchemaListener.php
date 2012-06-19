@@ -86,7 +86,7 @@ class CreateSchemaListener implements EventSubscriber
         $this->platform = $this->conn->getDatabasePlatform();
         $schema = $eventArgs->getSchema();
         $revisionsTable = $schema->createTable($this->config->getRevisionTableName());
-        if ($this->platform->getName() === 'oracle') {
+        if ($this->platform->getName() === 'oracle' || $this->platform->getName() == 'postgresql') {
             $revisionsTable->addColumn($this->config->getRevisionIdFieldName(), $this->config->getRevisionIdFieldType(), array(
                 'autoincrement' => false,
             ));
